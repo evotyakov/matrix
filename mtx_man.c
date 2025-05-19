@@ -45,26 +45,22 @@ int matrix_transpose(matrix *m)
     return 0;
 }
 
-int matrix_swap_rows (matrix *m, size_t row1, size_t row2)
+int matrix_swap_rows(matrix *m, size_t row1, size_t row2)
 {
-    if (!m || row1 < 1 || row2 < 1 ||
-        row1 > matrix_h(m) || row2 > matrix_h(m)) return -1;
-    --row1; --row2;
+    if (!m || row1 >= matrix_h(m) || row2 >= matrix_h(m)) return -1;
 
     for (size_t j = 0; j < matrix_w(m); ++j)
     {
-        double el = *matrix_ptr(m, row1, j);
+        double tmp = *matrix_ptr(m, row1, j);
         *matrix_ptr(m, row1, j) = *matrix_ptr(m, row2, j);
-        *matrix_ptr(m, row2, j) = el;
+        *matrix_ptr(m, row2, j) = tmp;
     }
     return 0;
 }
 
 int matrix_swap_cols (matrix *m, size_t col1, size_t col2)
 {
-    if (!m || col1 < 1 || col2 < 1 ||
-        col1 > matrix_w(m) || col2 > matrix_w(m)) return -1;
-    --col1; --col2;
+    if (!m || col1 >= matrix_w(m) || col2 >= matrix_w(m)) return -1;
 
     for (size_t i = 0; i < matrix_h(m); ++i)
     {
@@ -77,8 +73,7 @@ int matrix_swap_cols (matrix *m, size_t col1, size_t col2)
 
 int matrix_row_smul (matrix *m, size_t row, double d)
 {
-    if (!m || row < 1 || row > matrix_h(m)) return -1;
-    --row;
+    if (!m || row >= matrix_h(m)) return -1;
 
     for (size_t j = 0; j < matrix_w(m); ++j)
     {
@@ -95,9 +90,7 @@ int matrix_row_sdiv (matrix *m, size_t row, double d)
 
 int matrix_rows_add (matrix *m, size_t row1, size_t row2)
 {
-    --row1; --row2;
-    if (!m || row1 < 0 || row2 < 0 ||
-        row1 >= matrix_h(m) || row2 >= matrix_h(m)) return -1;
+    if (!m || row1 >= matrix_h(m) || row2 >= matrix_h(m)) return -1;
 
     for (size_t j = 0; j < matrix_w(m); ++j)
     {

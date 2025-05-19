@@ -45,7 +45,7 @@ int main()
 
             m = matrix_alloc(3, 2);
             matrix_input(m);
-            printf("(2, 2) = %.2f\n\n", matrix_get(m, 1, 1));
+            printf("(1, 1) = %.2f\n\n", matrix_get(m, 1, 1));
             matrix_output(m);
             matrix_free(m);
 
@@ -154,7 +154,24 @@ int main()
             matrix *B = matrix_alloc(2, 1);
             matrix_input(B);
             matrix *X = matrix_gauss_method(A, B);
-            if (!verify_solution(A, X, B, 1e-6)) matrix_output(X);
+            int check = verify_solution(A, X, B, 1e-6);
+            switch (check)
+            {
+            case 0:
+                matrix_output(X);
+                break;
+
+            case -1:
+                printf("Error\n");
+                break;
+
+            case 1:
+                printf("Matrix norm > eps\n");
+                break;
+            
+            default:
+                break;
+            }
 
             matrix_free(A);
             matrix_free(B);

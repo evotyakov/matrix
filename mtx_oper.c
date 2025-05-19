@@ -57,6 +57,8 @@ int matrix_add2 (matrix *m, const matrix *m1, const matrix *m2)
 
     matrix_assign(m, m1);
     matrix_add(m, m2);
+
+    return 0;
 }
 
 int matrix_sub2 (matrix *m, const matrix *m1, const matrix *m2)
@@ -67,6 +69,8 @@ int matrix_sub2 (matrix *m, const matrix *m1, const matrix *m2)
 
     matrix_assign(m, m1);
     matrix_sub(m, m2);
+
+    return 0;
 }
 
 int matrix_smul2 (matrix *m, const matrix *m1, double d)
@@ -76,6 +80,8 @@ int matrix_smul2 (matrix *m, const matrix *m1, double d)
 
     matrix_assign(m, m1);
     matrix_smul(m, d);
+
+    return 0;
 }
 
 int matrix_sdiv2 (matrix *m, const matrix *m1, double d)
@@ -85,6 +91,8 @@ int matrix_sdiv2 (matrix *m, const matrix *m1, double d)
 
     matrix_assign(m, m1);
     matrix_sdiv(m, d);
+
+    return 0;
 }
 
 int matrix_mul(matrix *m1, const matrix *m2)
@@ -130,10 +138,39 @@ int matrix_mul(matrix *m1, const matrix *m2)
 
 int matrix_mul2 (matrix *m, const matrix *m1, const matrix *m2)
 {
-    if (!m || !m1 || !m2) return -1;
-    if (matrix_realloc(m, matrix_h(m1), matrix_w(m1)) == -1 || matrix_assign(m, m1) == -1) return -1;
+    if (!m || !m1 || !m2 || matrix_w(m1) != matrix_h(m2)) return -1;
 
-    matrix_mul(m, m2);
+    if (m == m1 || m == m2)
+    {
+        matrix* tmp = matrix_copy((m == m1) ? m1 : m2);
+        if (!tmp) return -1;
+        
+        int result = matrix_mul2(m, (m == m1) ? tmp : m1, (m == m2) ? tmp : m2);
+        matrix_free(tmp);
+        return result;
+    }
 
+    const size_t h = matrix_h(m1);
+    const size_t w = matrix_w(m2);
+    const size_t inner = matrix_w(m1);
+
+    if (matrix_h(m) != h || matrix_w(m) != w)
+    {
+        if (matrix_realloc(m, h, w) == -1) return -1;
+    }
+    
+    for (size_t i = 0; i < h; ++i)
+    {
+        for (size_t j = 0; j < w; ++j)
+        {
+            double sum = 0.0;
+            for (size_t k = 0; k < inner; ++k)
+            {
+                sum += matrix_get(m1, i, k) * matrix_get(m2, k, j);
+            }
+            matrix_set(m, i, j, sum);
+        }
+    }    
+    
     return 0;
 }
